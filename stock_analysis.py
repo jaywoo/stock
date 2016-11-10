@@ -14,20 +14,19 @@ ref：ref(open,1) 表示前一天开盘价格
 
 import tushare as ts
 import datetime,time
+import os
+from functools import partial
+import config as conf
+import lib 
 
+output_file = conf.output_file%(conf.end_date)
+if os.path.isfile(output_file):
+    os.remove(output_file)
 
-now = datetime.datetime.now()
-start_date = (now-datetime.timedelta(10)).strftime("%Y-%m-%d")
-end_date   = now.strftime("%Y-%m-%d")
+f = open(output_file,'ab+')
+f.write(conf.html_head%(conf.end_date))
 
-# stock_df   = ts.get_hist_data('603060',start_date,end_date)
-# print stock_df
-# exit()
-
-def REF(data,key,num=0):
-    return data.ix[num,key]
-
-stock_code_file = open('stock_code.txt','r')
+stock_code_file = open(conf.stock_code_file,'r')
 
 #sh600000,600000,浦发银行
 for line in stock_code_file.readlines():
@@ -37,29 +36,40 @@ for line in stock_code_file.readlines():
     stock_arr  = line.split(',')
     stock_code = stock_arr[1]
 
-    print stock_code
-    stock_df   = ts.get_hist_data(stock_code,start_date,end_date)
+    # print stock_code
+    stock_df   = ts.get_hist_data(stock_code,conf.start_date,conf.end_date)
     
     if stock_df.empty or  len(stock_df) < 3:
         continue
 
-    stock_open_1  = REF(stock_df,"open",1)
-    stock_close_1 = REF(stock_df,"close",1)
+    stock_df.ref =  partial(lib.ref, stock_df)
+    open_1  = stock_df.ref("open",1)
+    close_1 = stock_df.ref("close",1)
+    high_1 = stock_df.ref("high",1)
+    low_1  = stock_df.ref("low",1)
     # 蜡烛实体
-    candle_body= stock_open_1 - stock_close_1
+    candle_body_1 = open_1 - close_1
     # 蜡烛长度
-    candle_len = REF(stock_df,"high",1) - REF(stock_df,"low",1)
+    candle_len_1 = high_1 - low_1
     
-    stock_open  = REF(stock_df,"open")
-    stock_close = REF(stock_df,"close")
+    stock_open  = stock_df.ref("open")
+    stock_close = stock_df.ref("close")
 
-    if (stock_open <= stock_close_1) and (stock_close >= (stock_close_1+candle_body/2)) : 
-        # print stock_code
-        url = "http://image.sinajs.cn/newchart/daily/n/%s.gif"%(stock_arr[0])
-        print url
+    ''' 
+        向上刺透形态
+            1.前一天实体占线的一半以上 ： (open-close) >= (high - low )/2 
+            2.当天开盘价小于等于前一天收盘价
+            3.收盘价在前一天实体1/2处或以上 close > (ref(open,1)+ref(close,1))/2
+    '''
+    
+    if ( candle_body_1 >= candle_len_1/2 and stock_open <= close_1 and  stock_close >= (open_1+close_1)/2 ): 
+        print stock_code
+        url  = conf.url%(stock_arr[0])
+        body = conf.html_body%(url)
+        f.write(body)
         
-
+f.write(conf.html_end)
 stock_code_file.close()
-
+f.close()
 
 
