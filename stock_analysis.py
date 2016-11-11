@@ -23,6 +23,10 @@ import tactics as ttc
 
 def output_stock_code(stock_dict,html_head,html_end):
     for index in stock_dict:
+        
+        if not stock_dict[index]:
+            continue
+
         f_file = conf.output_file_path+"%s_%s.html"%(index,conf.end_date)
 
         if os.path.isfile(f_file):
