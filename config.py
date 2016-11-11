@@ -26,7 +26,7 @@ html_head = '''
   </style>
  </head>
  <body>
-        <div style="width:1100px;margin:26px auto">
+        <div style="width:1200px;margin:26px auto;padding-bottom:26px;overflow:hidden">
 '''
 html_end  = '''     
     <div>
@@ -35,12 +35,12 @@ html_end  = '''
 
 '''
 url  = "http://image.sinajs.cn/newchart/daily/n/%s.gif"
-html_body = '''<div class="pd10 fl"><img src="%s"></div>'''
+html_body = '''<div class="pd10 fl">%s<br/><img src="%s"></div>'''
 
 now        = datetime.datetime.now()
 start_date = (now-datetime.timedelta(10)).strftime("%Y-%m-%d")
 end_date   = now.strftime("%Y-%m-%d")
-output_file     = 'stock_%s.html'
+output_file_path = './'
 stock_code_file = 'stock_code.txt'
 
 
