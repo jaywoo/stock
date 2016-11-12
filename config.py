@@ -41,7 +41,8 @@ now        = datetime.datetime.now()
 start_date = (now-datetime.timedelta(10)).strftime("%Y-%m-%d")
 end_date   = now.strftime("%Y-%m-%d")
 output_file_path = './'
-stock_code_file = 'stock_code.txt'
+# stock_code_file = 'stock_code.txt'
+stock_code_file = 'stock_code_10'
 
 
 def REF(data,key,num=0):

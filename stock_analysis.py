@@ -17,7 +17,7 @@ import datetime,time
 import os
 # from functools import partial
 import config as conf
-# import lib 
+import math
 import tactics as ttc
 
 
@@ -42,26 +42,48 @@ def output_stock_code(stock_dict,html_head,html_end):
         f.write(conf.html_end)
         f.close()
 
+# 获取days个工作日前的日期
+def get_work_date(days,now = datetime.datetime.now()):
+    # 计算天数=周末数*2+days 
+    counts = math.ceil((days-now.weekday())/5.0)*2+days
+    return now - datetime.timedelta(counts)
 
-stock_code_file = open(conf.stock_code_file,'r')
+def main1():
+    now        = datetime.datetime.now()
+    start_date = (now-datetime.timedelta(10)).strftime("%Y-%m-%d")
+    stock_basics = ts.get_stock_basics()
+    for code,stock in stock_basics.iterrows():
+        # ts.get_hist_data(code)
+        pass
 
-stock_dict = {}
-stock_dict['up_cross_inside_list'] = []
+def main():
+    stock_code_file = open("%s/%s"%(os.getcwd(),conf.stock_code_file),'r')
+    stock_dict = {}
+    stock_dict['up_cross_inside_list'] = []
 
-#sh600000,600000,浦发银行
-for line in stock_code_file.readlines():
-    stock_arr  = line.split(',')
-    stock_code = stock_arr[1]
+    #sh600000,600000,浦发银行
+    for line in stock_code_file.readlines():
+        stock_arr  = line.split(',')
+        stock_code = stock_arr[1]
 
-    # print stock_code
-    stock_df   = ts.get_hist_data(stock_code,conf.start_date,conf.end_date)
-    
-    if stock_df.empty or  len(stock_df) < 3:
-        continue
+        # print stock_code
+        stock_df   = ts.get_hist_data(stock_code,conf.start_date,conf.end_date)
+        
+        if stock_df.empty or  len(stock_df) < 3:
+            continue
 
-    if ttc.up_cross_inside_candle(stock_df) :
-        stock_dict['up_cross_inside_list'].append(stock_arr)
+        if ttc.up_cross_inside_candle(stock_df) :
+            stock_dict['up_cross_inside_list'].append(stock_arr)
 
-stock_code_file.close()
-output_stock_code(stock_dict,conf.html_head,conf.html_end)
+    stock_code_file.close()
+    output_stock_code(stock_dict,conf.html_head,conf.html_end)
 
+
+if __name__ == '__main__':
+    # main()
+    # main1()
+    print get_work_date(5).strftime("%Y-%m-%d")
+    print get_work_date(6).strftime("%Y-%m-%d")
+    print get_work_date(12).strftime("%Y-%m-%d")
+    print get_work_date(13).strftime("%Y-%m-%d")
+    print get_work_date(21).strftime("%Y-%m-%d")
