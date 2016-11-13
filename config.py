@@ -34,8 +34,8 @@ html_end  = '''
 </html>
 
 '''
-url  = "http://image.sinajs.cn/newchart/daily/n/%s.gif"
-html_body = '''<div class="pd10 fl">%s<br/><img src="%s"></div>'''
+daily_url  = "http://image.sinajs.cn/newchart/daily/n/%s.gif"
+html_body  = '''<div class="pd10 fl">%s<br/><img src="%s"></div>'''
 
 now        = datetime.datetime.now()
 start_date = (now-datetime.timedelta(10)).strftime("%Y-%m-%d")

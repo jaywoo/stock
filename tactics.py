@@ -24,7 +24,10 @@ def up_cross_inside_candle(stock_df):
             2.当天开盘价小于等于前一天收盘价
             3.收盘价在前一天实体1/2处或以上 close > (ref(open,1)+ref(close,1))/2
     '''
-    if ( candle_body_1 >= candle_len_1/2 and stock_open <= close_1 and  stock_close >= (open_1+close_1)/2 and stock_close <= high_1): 
+    if ( candle_body_1 >= candle_len_1/2 and 
+        stock_open <= close_1*1.005 and  
+        stock_close >= (open_1+close_1)/2 and 
+        stock_close <= high_1): 
         return True
     return False
 
